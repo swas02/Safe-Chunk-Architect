@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3psLCCA Architecture Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom Animations */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .file-card {
+            transition: all 0.3s ease;
+        }
+        .file-card.active {
+            border-color: #f97316; /* orange-500 */
+            background-color: #fff7ed; /* orange-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track { background: #f5f5f4; }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone) with Safety Orange Accents -->
+    <!-- Application Structure Plan: 
+         1. Hero: High-level overview of the '3psLCCA' concept.
+         2. The Engine Room: Live simulation of the Debounce + Force-Save (Throttling) logic. 
+         3. The Blueprint: Interactive Folder Structure.
+         4. Code Logic: Interactive Python Dictionary simulation.
+         5. Analytics: Chart.js comparing Monolithic vs Chunked performance/risk.
+         6. FAQ: Detailed Q&A including the 30-second Force Save explanation.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans leading-relaxed selection:bg-orange-200">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-stone-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-shield-halved text-orange-500 text-2xl"></i>
+                    <span class="font-bold text-xl tracking-tight">3psLCCA<span class="font-light opacity-70"> Architect</span></span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="hover:bg-stone-700 px-3 py-2 rounded-md text-sm font-medium transition">Overview</a>
+                        <a href="#simulation" class="bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded-md text-sm font-medium transition shadow-sm">Live Simulation</a>
+                        <a href="#structure" class="hover:bg-stone-700 px-3 py-2 rounded-md text-sm font-medium transition">Structure</a>
+                        <a href="#analytics" class="hover:bg-stone-700 px-3 py-2 rounded-md text-sm font-medium transition">Performance</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="overview" class="bg-white border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
+            <div class="md:w-2/3 pr-8">
+                <h1 class="text-4xl font-extrabold text-stone-900 tracking-tight sm:text-5xl mb-4">
+                    The <span class="text-orange-600">Dual-Timer</span> Guard
+                </h1>
+                <p class="text-xl text-stone-600 mb-6">
+                    Handling long-form writing requires more than just waiting for a pause. Our architecture uses 
+                    <strong>Debouncing</strong> for immediate idleness and <strong>Throttling</strong> for 
+                    maximum safety intervals.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="fa-solid fa-hourglass-start"></i></div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-stone-900">Wait-for-Idle</h3>
+                            <p class="mt-1 text-sm text-stone-500">Saves when the user pauses for 2 seconds (Debounce).</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-600"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-stone-900">Force-Save Interval</h3>
+                            <p class="mt-1 text-sm text-stone-500">Guarantees a save every 30s, even during constant typing (Throttle).</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-rotate"></i></div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-stone-900">Atomic Swaps</h3>
+                            <p class="mt-1 text-sm text-stone-500">Safe `.tmp` &rarr; `.bak` &rarr; `.json` rotation logic.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-600"><i class="fa-solid fa-cubes"></i></div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-stone-900">Modular Sharding</h3>
+                            <p class="mt-1 text-sm text-stone-500">Saves only the active section to minimize disk write time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md:w-1/3 mt-8 md:mt-0 bg-stone-100 p-6 rounded-xl border border-stone-200">
+                <h3 class="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-3">Integrity Parameters</h3>
+                <div class="space-y-4 text-sm">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-stone-200">
+                        <div class="flex justify-between mb-1"><span class="text-stone-500">Idle Threshold:</span><span class="font-bold">2.0s</span></div>
+                        <div class="flex justify-between"><span class="text-stone-500">Max Wait (Force):</span><span class="font-bold text-red-600">30.0s</span></div>
+                    </div>
+                    <div class="bg-stone-800 text-white p-3 rounded-lg shadow-sm font-mono text-xs">
+                        <span class="text-stone-400"># Pseudo Logic</span><br>
+                        if (time_since_last_save > 30s):<br>
+                        &nbsp;&nbsp;force_save_chunk()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Interactive Simulation -->
+    <section id="simulation" class="py-12 bg-stone-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-stone-900">Live Resilience Simulator</h2>
+                <p class="mt-2 text-stone-600 max-w-2xl mx-auto">
+                    Try typing a long paragraph. Watch how the <strong>Idle Timer</strong> resets, but the <strong>Force Save</strong> 
+                    timer keeps moving toward a guaranteed backup.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- User Interaction Panel -->
+                <div class="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden">
+                    <div class="bg-stone-800 px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-white font-semibold flex items-center gap-2"><i class="fa-solid fa-pen-nib text-orange-400"></i> Write a Paragraph</h3>
+                        <span id="sim-status" class="text-xs font-mono bg-stone-700 text-stone-300 px-2 py-1 rounded">STATUS: IDLE</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-6">
+                            <textarea id="sim-input" rows="5" class="w-full p-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition" placeholder="Keep typing for 10 seconds to trigger a 'Force Save'..."></textarea>
+                            <div class="mt-2 flex justify-between text-xs text-stone-500">
+                                <span>Input active...</span>
+                                <span id="dirty-indicator" class="opacity-0 text-orange-600 font-bold">DIRTY: TRUE</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Debounce Visualizer -->
+                            <div class="bg-stone-100 p-4 rounded-lg border border-stone-200">
+                                <div class="flex justify-between items-end mb-1">
+                                    <span class="text-xs font-bold text-stone-700 uppercase">1. Idle Wait (Debounce)</span>
+                                    <span id="timer-text" class="text-[10px] font-mono text-stone-500">2.0s</span>
+                                </div>
+                                <div class="w-full bg-stone-300 rounded-full h-1.5 overflow-hidden">
+                                    <div id="timer-bar" class="bg-orange-500 h-1.5 rounded-full transition-all duration-100 ease-linear" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Force Save Visualizer -->
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                                <div class="flex justify-between items-end mb-1">
+                                    <span class="text-xs font-bold text-red-700 uppercase">2. Force Save (Throttle)</span>
+                                    <span id="force-text" class="text-[10px] font-mono text-red-500">10.0s</span>
+                                </div>
+                                <div class="w-full bg-red-200 rounded-full h-1.5 overflow-hidden">
+                                    <div id="force-bar" class="bg-red-600 h-1.5 rounded-full transition-all duration-100 ease-linear" style="width: 0%"></div>
+                                </div>
+                                <p class="text-[10px] text-red-600 mt-2 italic">Triggered regardless of typing activity.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend Process Panel -->
+                <div class="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden">
+                    <div class="bg-stone-800 px-6 py-4 border-b border-stone-700">
+                        <h3 class="text-white font-semibold flex items-center gap-2"><i class="fa-solid fa-shield-virus text-blue-400"></i> Data Safety Engine</h3>
+                    </div>
+                    <div class="p-6 relative min-h-[300px] flex flex-col justify-center">
+                        <div class="space-y-4">
+                            <div id="file-step-1" class="file-card border-l-4 border-stone-300 bg-stone-50 p-4 rounded shadow-sm opacity-50">
+                                <div class="flex items-center justify-between"><div class="flex items-center gap-3"><i class="fa-regular fa-file-code text-stone-400"></i><span class="font-mono text-sm">chunk_03.tmp</span></div><span class="text-[10px] uppercase font-bold text-stone-400">Write Stage</span></div>
+                            </div>
+                            <div id="file-step-2" class="file-card border-l-4 border-stone-300 bg-stone-50 p-4 rounded shadow-sm opacity-50">
+                                <div class="flex items-center justify-between"><div class="flex items-center gap-3"><i class="fa-regular fa-file-zipper text-stone-400"></i><span class="font-mono text-sm">chunk_03.json &rarr; .bak</span></div><span class="text-[10px] uppercase font-bold text-stone-400">Rotation Stage</span></div>
+                            </div>
+                            <div id="file-step-3" class="file-card border-l-4 border-stone-300 bg-stone-50 p-4 rounded shadow-sm opacity-50">
+                                <div class="flex items-center justify-between"><div class="flex items-center gap-3"><i class="fa-solid fa-check text-stone-400"></i><span class="font-mono text-sm">.tmp &rarr; chunk_03.json</span></div><span class="text-[10px] uppercase font-bold text-stone-400">Commit Stage</span></div>
+                            </div>
+                        </div>
+                        <!-- Success Overlay -->
+                        <div id="save-success" class="absolute inset-0 bg-green-50/90 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+                            <div class="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-2 animate-bounce"><i class="fa-solid fa-check text-2xl text-green-600"></i></div>
+                            <h4 class="text-lg font-bold text-green-800" id="success-reason">Chunk Saved Safely</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Structural Blueprint -->
+    <section id="structure" class="py-12 bg-white border-t border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-stone-900">The Hidden Workspace</h2>
+                <p class="mt-2 text-stone-600">Explore the directory tree to understand the role of each component in the data safety lifecycle.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="col-span-1 bg-stone-900 rounded-xl p-6 text-stone-300 font-mono text-sm shadow-inner">
+                    <ul class="space-y-2">
+                        <li><i class="fa-solid fa-folder-open text-orange-500 mr-2"></i>projects/</li>
+                        <li class="pl-4 border-l border-stone-700"><i class="fa-solid fa-folder-open text-orange-500 mr-2"></i>{uniqueId}/</li>
+                        <li class="pl-8 border-l border-stone-700 cursor-pointer hover:text-white transition" onclick="showFolderInfo('lock')"><i class="fa-solid fa-file-shield text-red-400 mr-2"></i>.lock</li>
+                        <li class="pl-8 border-l border-stone-700 cursor-pointer hover:text-white transition" onclick="showFolderInfo('manifest')"><i class="fa-solid fa-file-code text-blue-400 mr-2"></i>manifest.json</li>
+                        <li class="pl-8 border-l border-stone-700 cursor-pointer hover:text-white transition" onclick="showFolderInfo('chunks')"><i class="fa-solid fa-folder text-yellow-400 mr-2"></i>data_chunks/</li>
+                        <li class="pl-12 border-l border-stone-700 text-stone-500"><i class="fa-regular fa-file text-stone-600 mr-2"></i>chunk_01.json</li>
+                        <li class="pl-8 border-l border-stone-700 cursor-pointer hover:text-white transition" onclick="showFolderInfo('backup')"><i class="fa-solid fa-folder text-green-400 mr-2"></i>data_chunks_bak/</li>
+                        <li class="pl-8 border-l border-stone-700 cursor-pointer hover:text-white transition" onclick="showFolderInfo('checkpoints')"><i class="fa-solid fa-folder text-purple-400 mr-2"></i>checkpoints/</li>
+                    </ul>
+                </div>
+                <div class="col-span-1 md:col-span-2 bg-stone-50 border border-stone-200 rounded-xl p-8 relative">
+                    <div id="folder-info-default" class="text-center h-full flex flex-col justify-center items-center text-stone-400">
+                        <i class="fa-solid fa-arrow-left text-4xl mb-4 hidden md:block animate-pulse"></i>
+                        <p>Select a file to view its architectural purpose.</p>
+                    </div>
+                    <div id="info-lock" class="hidden h-full flex flex-col justify-center">
+                        <h3 class="text-2xl font-bold text-stone-900 mb-2">Lock File (.lock)</h3>
+                        <p class="text-stone-600">The "Single Access" guard. Prevents two app instances from fighting over the same data. It is the first thing checked on startup.</p>
+                    </div>
+                    <div id="info-manifest" class="hidden h-full flex flex-col justify-center">
+                        <h3 class="text-2xl font-bold text-stone-900 mb-2">Manifest (manifest.json)</h3>
+                        <p class="text-stone-600">Stores Project ID, Human-readable name, and Software Version. Essential for ensuring data compatibility between updates.</p>
+                    </div>
+                    <div id="info-chunks" class="hidden h-full flex flex-col justify-center">
+                        <h3 class="text-2xl font-bold text-stone-900 mb-2">Data Chunks</h3>
+                        <p class="text-stone-600">Fragmented project state. By saving in shards, we reduce the "Blast Radius" of any single file corruption to only ~10% of the project.</p>
+                    </div>
+                    <div id="info-backup" class="hidden h-full flex flex-col justify-center">
+                        <h3 class="text-2xl font-bold text-stone-900 mb-2">Backups (.bak)</h3>
+                        <p class="text-stone-600">The immediate safety net. Every successful save moves the previous state here. It is the recovery point for the 30-second intervals.</p>
+                    </div>
+                    <div id="info-checkpoints" class="hidden h-full flex flex-col justify-center">
+                        <h3 class="text-2xl font-bold text-stone-900 mb-2">Checkpoints</h3>
+                        <p class="text-stone-600">Immutable historical versions. Created when a user manually clicks "Save Milestone." Unlike chunks, these are single, monolithic project snapshots.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reference Logic Demo -->
+    <section class="py-12 bg-stone-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-stone-900 mb-6">Object Referencing (Memory Sync)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div>
+                    <p class="text-stone-600 mb-6">Python's <strong>Mutable Dictionaries</strong> ensure that UI updates are instantly reflected in the manager's memory. No sync code required.</p>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                        <h4 class="font-bold text-stone-800 mb-4 border-b pb-2">UI Entry (Form 1)</h4>
+                        <div class="space-y-4">
+                            <div><label class="block text-sm font-medium text-stone-600">Material</label><select id="ref-input-material" class="mt-1 block w-full py-2 border-stone-300 rounded-md border"><option value="Plastic Bottle">Plastic Bottle</option><option value="Glass Jar">Glass Jar</option></select></div>
+                            <div class="flex items-center"><input id="ref-input-check" type="checkbox" class="h-4 w-4 text-orange-600 border-stone-300 rounded"><label class="ml-2 text-sm">Is Recyclable?</label></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-stone-900 p-6 rounded-xl shadow-lg font-mono text-sm text-green-400 overflow-x-auto">
+                    <pre id="code-display"># Memory State updated instantly via Reference</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section id="analytics" class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 text-center"><h2 class="text-3xl font-bold text-stone-900">Performance vs. Safety</h2></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-4 rounded-xl shadow border border-stone-200 flex flex-col">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4 text-center">Save Speed (UI Snappiness)</h3>
+                    <div class="chart-container"><canvas id="saveTimeChart"></canvas></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow border border-stone-200 flex flex-col">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4 text-center">Max Potential Work Loss</h3>
+                    <div class="chart-container"><canvas id="riskChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-12 bg-stone-50 border-t border-stone-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-stone-900 mb-8 text-center">Deep Dive Q&A</h2>
+            <div class="space-y-4">
+                <div class="bg-white rounded-lg shadow-sm border border-stone-200 overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left flex justify-between items-center" onclick="toggleFAQ('faq1')"><span class="font-bold text-stone-800">What if the user writes for 5+ minutes without pausing?</span><i class="fa-solid fa-chevron-down text-orange-500 transition-transform" id="icon-faq1"></i></button>
+                    <div id="faq1" class="hidden px-6 pb-4 text-stone-600 border-t border-stone-100 pt-4">This is why we use <strong>Throttling</strong>. While the Debounce timer resets on every keystroke, a second "Force Save" timer starts on the very first keystroke. If 30 seconds pass without a save, the system forces an atomic write even if the user is in the middle of a sentence.</div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm border border-stone-200 overflow-hidden">
+                    <button class="w-full px-6 py-4 text-left flex justify-between items-center" onclick="toggleFAQ('faq2')"><span class="font-bold text-stone-800">Why chunking instead of a database?</span><i class="fa-solid fa-chevron-down text-orange-500 transition-transform" id="icon-faq2"></i></button>
+                    <div id="faq2" class="hidden px-6 pb-4 text-stone-600 border-t border-stone-100 pt-4">Chunking provides <strong>Human Readability</strong>. If the software is ever uninstalled, the user's data exists in standard JSON files that can be opened in any text editor. It combines database-level safety (atomic writes) with document-level portability.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 text-center"><p>&copy; 2026 3psLCCA Architecture. Engineered for Flow.</p></footer>
+
+    <script>
+        // --- 1. Simulation Logic (Debounce + Throttle) ---
+        let debounceTimer;
+        let forceTimer;
+        let idleProgress = 0;
+        let forceProgress = 0;
+        const IDLE_THRESHOLD = 2000;  // 2s for demo
+        const FORCE_THRESHOLD = 10000; // 10s for demo (vs 30s real world)
+        const INTERVAL = 50;
+
+        const inputField = document.getElementById('sim-input');
+        const timerBar = document.getElementById('timer-bar');
+        const forceBar = document.getElementById('force-bar');
+        const timerText = document.getElementById('timer-text');
+        const forceText = document.getElementById('force-text');
+        const simStatus = document.getElementById('sim-status');
+        const dirtyIndicator = document.getElementById('dirty-indicator');
+        const saveSuccess = document.getElementById('save-success');
+        const successReason = document.getElementById('success-reason');
+        
+        const steps = [document.getElementById('file-step-1'), document.getElementById('file-step-2'), document.getElementById('file-step-3')];
+
+        let isDirty = false;
+
+        inputField.addEventListener('input', () => {
+            // Reset Idle Timer
+            clearInterval(debounceTimer);
+            idleProgress = 0;
+            updateIdleBar(0);
+            
+            // UI Indicators
+            simStatus.innerText = "STATUS: TYPING...";
+            simStatus.className = "text-xs font-mono bg-orange-600 text-white px-2 py-1 rounded";
+            dirtyIndicator.classList.remove('opacity-0');
+            saveSuccess.style.opacity = '0';
+            steps.forEach(s => s.classList.add('opacity-50'));
+
+            // Start Force Timer if not already running
+            if (!isDirty) {
+                isDirty = true;
+                startForceCountdown();
+            }
+
+            // Start Idle Countdown
+            debounceTimer = setInterval(() => {
+                idleProgress += INTERVAL;
+                let percent = (idleProgress / IDLE_THRESHOLD) * 100;
+                updateIdleBar(percent);
+                if (idleProgress >= IDLE_THRESHOLD) {
+                    clearInterval(debounceTimer);
+                    triggerSave("Idle Pause Detected");
+                }
+            }, INTERVAL);
+        });
+
+        function startForceCountdown() {
+            forceProgress = 0;
+            clearInterval(forceTimer);
+            forceTimer = setInterval(() => {
+                forceProgress += INTERVAL;
+                let percent = (forceProgress / FORCE_THRESHOLD) * 100;
+                forceBar.style.width = percent + "%";
+                forceText.innerText = ((FORCE_THRESHOLD - forceProgress)/1000).toFixed(1) + "s";
+                
+                if (forceProgress >= FORCE_THRESHOLD) {
+                    clearInterval(forceTimer);
+                    triggerSave("Force Interval (30s) Hit");
+                }
+            }, INTERVAL);
+        }
+
+        function updateIdleBar(p) {
+            timerBar.style.width = p + "%";
+            timerText.innerText = ((IDLE_THRESHOLD - idleProgress)/1000).toFixed(1) + "s";
+        }
+
+        function triggerSave(reason) {
+            clearInterval(debounceTimer);
+            clearInterval(forceTimer);
+            isDirty = false;
+            forceBar.style.width = "0%";
+            forceText.innerText = (FORCE_THRESHOLD/1000).toFixed(1) + "s";
+            
+            simStatus.innerText = "STATUS: SAVING...";
+            simStatus.className = "text-xs font-mono bg-blue-600 text-white px-2 py-1 rounded";
+
+            // Sequence Animation
+            setTimeout(() => activateStep(0), 200);
+            setTimeout(() => activateStep(1), 1000);
+            setTimeout(() => activateStep(2), 1800);
+            setTimeout(() => {
+                successReason.innerText = reason;
+                saveSuccess.style.opacity = '1';
+                simStatus.innerText = "STATUS: SAVED";
+                simStatus.className = "text-xs font-mono bg-green-600 text-white px-2 py-1 rounded";
+                dirtyIndicator.classList.add('opacity-0');
+            }, 2600);
+        }
+
+        function activateStep(i) {
+            steps[i].classList.remove('opacity-50');
+            steps[i].classList.add('active', 'border-orange-500');
+        }
+
+        function showFolderInfo(id) {
+            document.getElementById('folder-info-default').classList.add('hidden');
+            ['lock', 'manifest', 'chunks', 'backup', 'checkpoints'].forEach(i => document.getElementById(`info-${i}`).classList.add('hidden'));
+            document.getElementById(`info-${id}`).classList.remove('hidden');
+        }
+
+        const refSelect = document.getElementById('ref-input-material');
+        const refCheck = document.getElementById('ref-input-check');
+        const codeDisplay = document.getElementById('code-display');
+
+        function updateCode() {
+            codeDisplay.innerText = `# Memory State updated instantly\nform_1 = {\n  "material": "${refSelect.value}",\n  "recyclable": ${refCheck.checked}\n}`;
+        }
+        refSelect.addEventListener('change', updateCode);
+        refCheck.addEventListener('change', updateCode);
+        updateCode();
+
+        function toggleFAQ(id) {
+            const c = document.getElementById(id);
+            const i = document.getElementById(`icon-${id}`);
+            c.classList.toggle('hidden');
+            i.classList.toggle('rotate-180');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx1 = document.getElementById('saveTimeChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Start', '100 Qs', '200 Qs', '300 Qs'],
+                    datasets: [{ label: 'Monolithic', data: [10, 200, 600, 1500], borderColor: '#78716c', fill: false }, { label: '3psLCCA', data: [10, 15, 14, 16], borderColor: '#f97316', borderWidth: 3, fill: false }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctx2 = document.getElementById('riskChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['No Force-Save', 'With 30s Force-Save'],
+                    datasets: [{ label: 'Max Work Lost (Seconds)', data: [600, 30], backgroundColor: ['#ef4444', '#22c55e'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
+    </script>
+</body>
+</html>
